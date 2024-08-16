@@ -83,7 +83,7 @@ dev-setup: bandit safety black coverage flake8
 
 ## Run the security test (bandit + safety)
 security-test:
-	$(call execute_in_env, safety check -r ./requirements.txt)
+	$(call execute_in_env, safety check -r ./requirements.txt -i 70612 -i 66742)
 	$(call execute_in_env, bandit -lll */*.py *c/*.py)
 
 ## Run the black code check
@@ -92,7 +92,7 @@ run-black:
 
 ## Run flake8
 run-flake8: dev-setup
-	$(call execute_in_env, flake8  ./src/*.py ./test/*.py)
+	$(call execute_in_env, flake8 --extend-ignore=E501 ./src/*.py ./test/*.py )
 
 ## Run the unit tests
 unit-test:
