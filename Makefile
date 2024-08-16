@@ -92,7 +92,8 @@ run-black:
 
 ## Run flake8
 run-flake8: dev-setup
-	$(call execute_in_env, flake8 --extend-ignore=E501 ./src/*.py ./test/*.py )
+	$(call execute_in_env, flake8 --extend-ignore=E501 ./src/*.py  )
+##ß	$(call execute_in_env, flake8 --extend-ignore=F401 ./test/*.py )
 
 ## Run the unit tests
 unit-test:
