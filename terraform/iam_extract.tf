@@ -1,6 +1,7 @@
 // Creating a terraform IAMS role for Extract lambda function
 resource "aws_iam_role" "extract_lambda_role" {
     name_prefix = "role-${var.extract_lambda}"
+    force_detach_policies = true
     assume_role_policy = <<EOF
     {
         "Version": "2012-10-17",
@@ -23,26 +24,26 @@ resource "aws_iam_role" "extract_lambda_role" {
 
 // Set up terraform IAMS permissions for Lambda - Cloudwatch
 // //The IAM Policy Document specifies the permissions required for extract Lambda to access cloudwatch
-data "aws_iam_policy_document" "cw_document_extract"{
+data "aws_iam_policy_document" "cw_document_allow_logs"{
 
     statement {
       effect = "Allow"
       actions = ["logs:CreateLogStream","logs:PutLogEvents"]
-      resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.extract_lambda}:*",
-                    "arn:aws:logs:eu-west-2:590183674561:log-group:${aws_cloudwatch_log_group.alapin_extract_log_group.name}:*"]
+      resources = ["arn:aws:logs:eu-west-2:590183674561:log-group:${aws_cloudwatch_log_group.alapin_extract_log_group.name}:*"]
     }
 }
 
 //Create the IAM policy using the cloud watch policy document
-resource "aws_iam_policy" "cw_policy_extract" {
-    name_prefix = "cw-policy-${var.extract_lambda}"
-    policy = data.aws_iam_policy_document.cw_document_extract.json
+resource "aws_iam_policy" "cw_policy_allow_logs" {
+    name_prefix = "cw-policy-${var.extract_lambda}-${var.transform_lambda}-${var.load_lambda}"
+    policy = data.aws_iam_policy_document.cw_document_allow_logs.json
 }
 
 # Attach the CW Policy to the Extract Role
 resource "aws_iam_role_policy_attachment" "cw_policy_attachment_extract" {
     role = aws_iam_role.extract_lambda_role.name
-    policy_arn = aws_iam_policy.cw_policy_extract.arn
+    policy_arn = aws_iam_policy.cw_policy_allow_logs.arn
+   
   
 }
 
